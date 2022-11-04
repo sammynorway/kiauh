@@ -78,7 +78,7 @@ function install_mjpg-streamer() {
 EOT
 
   sudo cp "${webcamd}" "/usr/local/bin/webcamd"
-  sudo sed -i "/^config_dir=/ s|=.*|=${KLIPPER_CONFIG}|" /usr/local/bin/webcamd
+  sudo sed -i "/^config_dir=/ s|=.*|=${KLIPPER_CONFIG}|" /usr/local/bin/webcamd # KLIPPER_CONFIG don´t work
   sudo sed -i "/MJPGSTREAMER_HOME/ s/pi/${USER}/" /usr/local/bin/webcamd
   sudo chmod +x /usr/local/bin/webcamd
 
@@ -106,7 +106,7 @@ EOT
   fi
 
   ### step 6.1: create webcamd.log symlink
-  [[ ! -d ${KLIPPER_LOGS} ]] && mkdir -p "${KLIPPER_LOGS}"
+  [[ ! -d ${KLIPPER_LOGS} ]] && mkdir -p "${KLIPPER_LOGS}" #KLIPPER_LOGS don´t work
   if [[ -f "/var/log/webcamd.log" && ! -L "${KLIPPER_LOGS}/webcamd.log" ]]; then
     ln -s "/var/log/webcamd.log" "${KLIPPER_LOGS}/webcamd.log"
   fi
