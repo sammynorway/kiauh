@@ -112,6 +112,7 @@ function mjpg-streamer_setup_dialog() {
     for name in "${klipper_names[@]}"; do
       user_input+=("${name}")
     done
+    echo -e ("${name}")
   fi
 
   (( mjpg_streamer_count > 1 )) && status_msg "Installing ${mjpg_streamer_count} mjpg-streamer instances ..."
