@@ -111,8 +111,8 @@ function mjpg-streamer_setup_dialog() {
   if (( klipper_count > 1 )); then
     for name in "${klipper_names[@]}"; do
       user_input+=("${name}")
+      echo -e "${name}"
     done
-    echo -e ("${name}")
   fi
 
   (( mjpg_streamer_count > 1 )) && status_msg "Installing ${mjpg_streamer_count} mjpg-streamer instances ..."
