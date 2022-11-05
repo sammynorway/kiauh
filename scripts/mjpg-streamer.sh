@@ -52,10 +52,10 @@ function mjpg-streamer_setup_dialog() {
     klipper_names+=( "$(get_instance_name "${service}")" )
   done
 
-  local mjpg-streamer_count
+  local mjpg_streamer_count
   if (( klipper_count == 1 )); then
     ok_msg "Klipper installation found!\n"
-    mjpg-streamer_count=1
+    mjpg_streamer_count=1
   elif (( klipper_count > 1 )); then
     top_border
     printf "|${green}%-55s${white}|\n" " ${klipper_count} Klipper instances found!"
@@ -73,26 +73,26 @@ function mjpg-streamer_setup_dialog() {
 
     ### ask for amount of instances
     local re="^[1-9][0-9]*$"
-    while [[ ! ${mjpg-streamer_count} =~ ${re} || ${mjpg-streamer_count} -gt ${klipper_count} ]]; do
-      read -p "${cyan}###### Number of mjpg-streamer instances to set up:${white} " -i "${klipper_count}" -e mjpg-streamer_count
+    while [[ ! ${mjpg_streamer_count} =~ ${re} || ${mjpg_streamer_count} -gt ${klipper_count} ]]; do
+      read -p "${cyan}###### Number of mjpg-streamer instances to set up:${white} " -i "${klipper_count}" -e mjpg_streamer_count
       ### break if input is valid
-      [[ ${mjpg-streamer_count} =~ ${re} && ${mjpg-streamer_count} -le ${klipper_count} ]] && break
+      [[ ${mjpg_streamer_count} =~ ${re} && ${mjpg_streamer_count} -le ${klipper_count} ]] && break
       ### conditional error messages
-      [[ ! ${mjpg-streamer_count} =~ ${re} ]] && error_msg "Input not a number"
-      (( mjpg-streamer_count > klipper_count )) && error_msg "Number of mjpg-streamer instances larger than installed Klipper instances"
-    done && select_msg "${mjpg-streamer_count}"
+      [[ ! ${mjpg_streamer_count} =~ ${re} ]] && error_msg "Input not a number"
+      (( mjpg_streamer_count > klipper_count )) && error_msg "Number of mjpg-streamer instances larger than installed Klipper instances"
+    done && select_msg "${mjpg_streamer_count}"
   else
     log_error "Internal error. klipper_count of '${klipper_count}' not equal or grather than one!"
     return 1
   fi
 
-  user_input+=("${mjpg-streamer_count}")
+  user_input+=("${mjpg_streamer_count}")
 
   ### confirm instance amount
   local yn
   while true; do
-    (( mjpg-streamer_count == 1 )) && local question="Install mjpg-streamer?"
-    (( mjpg-streamer_count > 1 )) && local question="Install ${mjpg-streamer_count} mjpg-streamer instances?"
+    (( mjpg_streamer_count == 1 )) && local question="Install mjpg-streamer?"
+    (( mjpg_streamer_count > 1 )) && local question="Install ${mjpg_streamer_count} mjpg-streamer instances?"
     read -p "${cyan}###### ${question} (Y/n):${white} " yn
     case "${yn}" in
       Y|y|Yes|yes|"")
@@ -114,8 +114,8 @@ function mjpg-streamer_setup_dialog() {
     done
   fi
 
-  (( mjpg-streamer_count > 1 )) && status_msg "Installing ${mjpg-streamer_count} mjpg-streamer instances ..."
-  (( mjpg-streamer_count == 1 )) && status_msg "Installing mjpg-streamer ..."
+  (( mjpg_streamer_count > 1 )) && status_msg "Installing ${mjpg_streamer_count} mjpg-streamer instances ..."
+  (( mjpg_streamer_count == 1 )) && status_msg "Installing mjpg-streamer ..."
   moonraker_setup "${user_input[@]}"
 }
 ##################################################################################################
