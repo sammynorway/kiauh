@@ -63,9 +63,9 @@ function mjpg-streamer_setup_dialog() {
       printf "|${cyan}%-57s${white}|\n" " ● klipper-${name}"
     done
     blank_line
-    echo -e "| The setup will apply the same names to mjpg-streamer!     |"
+    echo -e "| The setup will apply the same names to mjpg-streamer! |"
     blank_line
-    echo -e "| Please select the number of mjpg-streamer instances to    |"
+    echo -e "| Please select the number of mjpg-streamer instances to|"
     echo -e "| install. Usually one mjpg-streamer instance per Klipper   |"
     echo -e "| instance is required, but you may not install more        |"
     echo -e "| mjpg-streamer instances than available Klipper instances. |"
@@ -116,7 +116,8 @@ function mjpg-streamer_setup_dialog() {
 
   (( mjpg_streamer_count > 1 )) && status_msg "Installing ${mjpg_streamer_count} mjpg-streamer instances ..."
   (( mjpg_streamer_count == 1 )) && status_msg "Installing mjpg-streamer ..."
-  moonraker_setup "${user_input[@]}"
+  #moonraker_setup "${user_input[@]}"
+  echo -e "${user_input[@]}"
 }
 ##################################################################################################
 
