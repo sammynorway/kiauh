@@ -14,6 +14,111 @@ set -e
 #=================================================#
 #============= INSTALL MJPG-STREAMER =============#
 #=================================================#
+########################################################
+function mjpg-streamer_setup_dialog() {
+  status_msg "Initializing mjpg-streamer installation ..."
+
+  ### return early if python version check fails
+  if [[ $(python3_check) == "false" ]]; then
+    local error="Versioncheck failed! Python 3.7 or newer required!\n"
+    error="${error} Please upgrade Python."
+    print_error "${error}" && return
+  fi
+
+  ### return early if moonraker already exists 
+  #local mjpg-streamer_services
+  #mjpg-streamer_services=$(moonraker_systemd)#!!??
+  #if [[ -n ${moonraker_services} ]]; then
+  #  local error="At least one Moonraker service is already installed:"
+  #  for s in ${moonraker_services}; do
+  #    log_info "Found Moonraker service: ${s}"
+  #    error="${error}\n ➔ ${s}"
+  #  done
+  #  print_error "${error}" && return
+  #fi
+
+  ### return early if klipper is not installed
+  local klipper_services
+  klipper_services=$(find_klipper_systemd) # function in utilies.sh
+  if [[ -z ${klipper_services} ]]; then
+    local error="Klipper not installed! Please install Klipper first!"
+    log_error "Moonraker setup started without Klipper being installed. Aborting setup."
+    print_error "${error}" && return
+  fi
+
+  local klipper_count user_input=() klipper_names=()
+  klipper_count=$(echo "${klipper_services}" | wc -w )
+  for service in ${klipper_services}; do
+    klipper_names+=( "$(get_instance_name "${service}")" )
+  done
+
+  local mjpg-streamer_count
+  if (( klipper_count == 1 )); then
+    ok_msg "Klipper installation found!\n"
+    mjpg-streamer_count=1
+  elif (( klipper_count > 1 )); then
+    top_border
+    printf "|${green}%-55s${white}|\n" " ${klipper_count} Klipper instances found!"
+    for name in "${klipper_names[@]}"; do
+      printf "|${cyan}%-57s${white}|\n" " ● klipper-${name}"
+    done
+    blank_line
+    echo -e "| The setup will apply the same names to mjpg-streamer!     |"
+    blank_line
+    echo -e "| Please select the number of mjpg-streamer instances to    |"
+    echo -e "| install. Usually one mjpg-streamer instance per Klipper   |"
+    echo -e "| instance is required, but you may not install more        |"
+    echo -e "| mjpg-streamer instances than available Klipper instances. |"
+    bottom_border
+
+    ### ask for amount of instances
+    local re="^[1-9][0-9]*$"
+    while [[ ! ${mjpg-streamer_count} =~ ${re} || ${mjpg-streamer_count} -gt ${klipper_count} ]]; do
+      read -p "${cyan}###### Number of mjpg-streamer instances to set up:${white} " -i "${klipper_count}" -e mjpg-streamer_count
+      ### break if input is valid
+      [[ ${mjpg-streamer_count} =~ ${re} && ${mjpg-streamer_count} -le ${klipper_count} ]] && break
+      ### conditional error messages
+      [[ ! ${mjpg-streamer_count} =~ ${re} ]] && error_msg "Input not a number"
+      (( mjpg-streamer_count > klipper_count )) && error_msg "Number of mjpg-streamer instances larger than installed Klipper instances"
+    done && select_msg "${mjpg-streamer_count}"
+  else
+    log_error "Internal error. klipper_count of '${klipper_count}' not equal or grather than one!"
+    return 1
+  fi
+
+  user_input+=("${mjpg-streamer_count}")
+
+  ### confirm instance amount
+  local yn
+  while true; do
+    (( mjpg-streamer_count == 1 )) && local question="Install mjpg-streamer?"
+    (( mjpg-streamer_count > 1 )) && local question="Install ${mjpg-streamer_count} mjpg-streamer instances?"
+    read -p "${cyan}###### ${question} (Y/n):${white} " yn
+    case "${yn}" in
+      Y|y|Yes|yes|"")
+        select_msg "Yes"
+        break;;
+      N|n|No|no)
+        select_msg "No"
+        abort_msg "Exiting mjpg-streamer setup ...\n"
+        return;;
+      *)
+        error_msg "Invalid Input!";;
+    esac
+  done
+
+  ### write existing klipper names into user_input array to use them as names for moonraker
+  if (( klipper_count > 1 )); then
+    for name in "${klipper_names[@]}"; do
+      user_input+=("${name}")
+    done
+  fi
+
+  (( mjpg-streamer_count > 1 )) && status_msg "Installing ${mjpg-streamer_count} mjpg-streamer instances ..."
+  (( mjpg-streamer_count == 1 )) && status_msg "Installing mjpg-streamer ..."
+  moonraker_setup "${user_input[@]}"
+}
+##################################################################################################
 
 function install_mjpg-streamer() {
   local webcamd="${KIAUH_SRCDIR}/resources/mjpg-streamer/webcamd"

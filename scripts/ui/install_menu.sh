@@ -65,7 +65,7 @@ function install_menu() {
       9)
         do_action "moonraker_obico_setup_dialog" "install_ui";;
       10)
-        do_action "install_mjpg-streamer" "install_ui";;
+        do_action "mjpg-streamer_setup_dialog" "install_ui";;
         #clear && print_header
         #print_error "Function currently disabled! Sorry!"
         #install_ui;;
